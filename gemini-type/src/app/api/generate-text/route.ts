@@ -53,15 +53,15 @@ export async function POST(request: NextRequest) {
     switch (level) {
       case 'Beginner':
         prompt =
-          'Generate a single, simple paragraph of about 40 words for a beginner typing test. The entire text must be in lowercase. Do not include any punctuation like periods, commas, or apostrophes. Use common English words.'
+          'Generate a single, simple paragraph of about 100 words for a beginner typing test. The entire text must be in lowercase. Do not include any punctuation like periods, commas, or apostrophes. Use common English words.'
         break
       case 'Intermediate':
         prompt =
-          'Generate a single paragraph of about 50 words for an intermediate typing test. The text must be entirely in lowercase. It must include proper use of commas and periods.'
+          'Generate a single paragraph of about 100 words for an intermediate typing test. The text must be entirely in lowercase. It must include proper use of commas and periods.'
         break
       case 'Advanced':
         prompt =
-          'Generate a single paragraph of about 60 words for an advanced typing test. The text must use proper sentence case, including capitalizing the first letter of sentences and any proper nouns. It must also include punctuation like commas, periods, and apostrophes where appropriate.'
+          'Generate a single paragraph of about 100 words for an advanced typing test. The text must use proper sentence case, including capitalizing the first letter of sentences and any proper nouns. It must also include punctuation like commas, periods, and apostrophes where appropriate.'
         break
     }
 
