@@ -1,0 +1,15 @@
+# netlify.toml (in your repository root)
+
+[build]
+  # Tell Netlify where your project is
+  base = "gemini-type"
+
+  # Tell Netlify what command to run (inside the base)
+  command = "npm run build"
+
+  # Tell Netlify where the build output is (inside the base)
+  publish = "gemini-type/.next"
+
+[[plugins]]
+  # Load the Next.js runtime plugin
+  package = "@netlify/next"
