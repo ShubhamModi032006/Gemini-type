@@ -35,7 +35,17 @@ const model = genAI.getGenerativeModel({
 export async function POST(request: NextRequest) {
   try {
     // 1. Parse the request body to get the level
-    const { level } = await request.json()
+    let body
+    try {
+      body = await request.json()
+    } catch (parseError) {
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      )
+    }
+    
+    const { level } = body
 
     if (!level || !['Beginner', 'Intermediate', 'Advanced'].includes(level)) {
       return NextResponse.json(

@@ -2,22 +2,30 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function POST(request: NextRequest) {
-  // 1. Create a Supabase client that can read the user's cookie
-  const supabase = await createClient()
-
-  // 2. Get the authenticated user from the server's session
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // 3. If no user is logged in, block the request
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
   try {
+    // 1. Create a Supabase client that can read the user's cookie
+    const supabase = await createClient()
+
+    // 2. Get the authenticated user from the server's session
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    // 3. If no user is logged in, block the request
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     // 4. Get the test data from the request
-    const body = await request.json()
+    let body
+    try {
+      body = await request.json()
+    } catch (parseError) {
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      )
+    }
 
     // 5. Securely insert the data
     //    We use user.id from the server, not from the body
@@ -47,9 +55,10 @@ export async function POST(request: NextRequest) {
 
   } catch (e) {
     console.error('Error processing request:', e)
+    // Ensure we always return JSON, even on unexpected errors
     return NextResponse.json(
-      { error: 'Invalid request body' }, 
-      { status: 400 }
+      { error: 'Internal server error', message: e instanceof Error ? e.message : 'Unknown error' }, 
+      { status: 500 }
     )
   }
 }

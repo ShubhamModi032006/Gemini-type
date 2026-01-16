@@ -66,6 +66,16 @@ const Results = ({ text, typed, onReset, mistakes, duration, level, user }: Resu
 
         clearTimeout(timeoutId)
 
+        // Check if response is JSON before parsing
+        const contentType = response.headers.get('content-type')
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await response.text()
+          console.error('Received non-JSON response:', text.substring(0, 100))
+          setSaveStatus('error')
+          savedResultKeyRef.current = null // Allow retry on error
+          return
+        }
+
         let responseData
         try {
           responseData = await response.json()

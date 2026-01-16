@@ -28,7 +28,19 @@ const TypingBox = ({ user }: TypingBoxProps) => {
         },
         body: JSON.stringify({ level }),
       })
+
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text()
+        console.error('Received non-JSON response from generate-text:', text.substring(0, 100))
+        throw new Error('Server returned non-JSON response')
+      }
+
       const data = await response.json()
+      if (!data.text) {
+        throw new Error('Invalid response format')
+      }
       setText(data.text)
       reset()
     } catch (error) {
