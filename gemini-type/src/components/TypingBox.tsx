@@ -29,6 +29,13 @@ const TypingBox = ({ user }: TypingBoxProps) => {
         body: JSON.stringify({ level }),
       })
 
+      // Check if response is successful
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        console.error('API error:', errorData)
+        throw new Error(errorData.error || 'Failed to generate text')
+      }
+
       // Check if response is JSON before parsing
       const contentType = response.headers.get('content-type')
       if (!contentType || !contentType.includes('application/json')) {
@@ -39,7 +46,8 @@ const TypingBox = ({ user }: TypingBoxProps) => {
 
       const data = await response.json()
       if (!data.text) {
-        throw new Error('Invalid response format')
+        console.error('Response data:', data)
+        throw new Error('Invalid response format: missing text property')
       }
       setText(data.text)
       reset()
