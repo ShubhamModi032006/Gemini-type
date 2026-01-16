@@ -47,6 +47,7 @@ const useTyping = (text: string, duration: number) => {
     if (status === 'in-progress' || status === 'finished') {
       reset()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duration])
 
   // Effect to handle test completion when all text is typed

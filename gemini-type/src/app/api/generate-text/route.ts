@@ -17,23 +17,19 @@ if (!GEMINI_API_KEY) {
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
 const model = genAI.getGenerativeModel({
   model: 'gemini-2.5-flash',
-})
-
-// Configuration for safety settings
-const generationConfig = {
-  temperature: 0.9,
-  topK: 1,
-  topP: 1,
-  maxOutputTokens: 2048,
-}
-
-const safetySettings = [
-  {
-    category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  generationConfig: {
+    temperature: 0.9,
+    topK: 1,
+    topP: 1,
+    maxOutputTokens: 2048,
   },
-  // ... (add other safety settings as needed)
-]
+  safetySettings: [
+    {
+      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+  ],
+})
 
 // The main POST function that handles requests
 export async function POST(request: NextRequest) {

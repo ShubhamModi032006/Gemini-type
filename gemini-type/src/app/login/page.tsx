@@ -17,11 +17,11 @@ export default function LoginPage() { // <-- Must be a default export
     e.preventDefault()
     setMessage('')
     
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
+        emailRedirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
       },
     })
 

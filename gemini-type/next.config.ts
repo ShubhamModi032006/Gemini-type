@@ -1,18 +1,15 @@
 // gemini-type/next.config.ts
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  // Add these two blocks:
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
+  // Production-ready: Don't ignore errors in production builds
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has type errors.
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
-};
+}
 
-export default nextConfig; // Use 'export default' for .ts files
+export default nextConfig

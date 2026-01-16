@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { calculateWPM, calculateAccuracy } from '@/lib/utils'
+import type { User } from '@supabase/supabase-js'
 
 interface ResultsProps {
   text: string
@@ -10,19 +11,28 @@ interface ResultsProps {
   mistakes: number
   duration: number
   level: string
-  user: any
+  user: User | null
 }
 
 const Results = ({ text, typed, onReset, mistakes, duration, level, user }: ResultsProps) => {
   const [isSaving, setIsSaving] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const savedResultKeyRef = useRef<string | null>(null)
   
   const correctChars = typed.split('').filter((char, i) => char === text[i]).length
   const wpm = calculateWPM(correctChars, duration)
   const accuracy = calculateAccuracy(correctChars, typed.length)
 
-  // Save test results to database when component mounts
+  // Create a unique key for this test result
+  const resultKey = `${wpm}-${accuracy}-${mistakes}-${level}-${duration}-${typed.length}`
+
+  // Save test results to database when component mounts (only once per unique result)
   useEffect(() => {
+    // Prevent duplicate saves for the same result
+    if (savedResultKeyRef.current === resultKey) {
+      return
+    }
+
     const saveResults = async () => {
       if (!user?.id) {
         console.log('No user logged in, skipping save')
@@ -30,6 +40,8 @@ const Results = ({ text, typed, onReset, mistakes, duration, level, user }: Resu
         return
       }
 
+      // Mark this result as being saved
+      savedResultKeyRef.current = resultKey
       setIsSaving(true)
       setSaveStatus('idle')
       
@@ -47,7 +59,7 @@ const Results = ({ text, typed, onReset, mistakes, duration, level, user }: Resu
             accuracy: accuracy,
             errorCount: mistakes,
             testLevel: level,
-            duration: duration, // <<< --- THIS IS THE FIX ---
+            duration: duration,
           }),
           signal: controller.signal,
         })
@@ -60,6 +72,7 @@ const Results = ({ text, typed, onReset, mistakes, duration, level, user }: Resu
         } catch (parseError) {
           console.error('Failed to parse response JSON:', parseError)
           setSaveStatus('error')
+          savedResultKeyRef.current = null // Allow retry on error
           return
         }
 
@@ -67,10 +80,12 @@ const Results = ({ text, typed, onReset, mistakes, duration, level, user }: Resu
           setSaveStatus('success')
         } else {
           setSaveStatus('error')
+          savedResultKeyRef.current = null // Allow retry on error
           console.error('Failed to save test results. Status:', response.status, 'Data:', responseData)
         }
       } catch (error) {
         setSaveStatus('error')
+        savedResultKeyRef.current = null // Allow retry on error
         if (error instanceof Error && error.name === 'AbortError') {
           console.error('Request timed out after 15 seconds')
         } else {
@@ -82,7 +97,7 @@ const Results = ({ text, typed, onReset, mistakes, duration, level, user }: Resu
     }
 
     saveResults()
-  }, [wpm, accuracy, mistakes, level, duration, user?.id])
+  }, [resultKey, wpm, accuracy, mistakes, level, duration, user?.id])
 
   return (
     <div className="text-center">

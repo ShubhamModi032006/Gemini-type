@@ -4,9 +4,10 @@ import { useState, useEffect, useRef } from 'react'
 import useTyping from '@/lib/hooks/useTyping'
 import Results from './Results'
 import AILoader from './AILoader'
+import type { User } from '@supabase/supabase-js'
 
 interface TypingBoxProps {
-  user: any
+  user: User | null
 }
 
 const TypingBox = ({ user }: TypingBoxProps) => {
@@ -14,7 +15,7 @@ const TypingBox = ({ user }: TypingBoxProps) => {
   const [duration, setDuration] = useState(30)
   const [text, setText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { typed, cursor, status, startTime, endTime, reset, mistakes, timeLeft, start } = useTyping(text, duration)
+  const { typed, cursor, status, reset, mistakes, timeLeft, start } = useTyping(text, duration)
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   const fetchText = async () => {
@@ -39,10 +40,12 @@ const TypingBox = ({ user }: TypingBoxProps) => {
 
   useEffect(() => {
     fetchText()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [level])
 
   useEffect(() => {
     reset()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duration])
 
   if (status === 'finished') {

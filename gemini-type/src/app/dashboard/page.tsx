@@ -5,7 +5,16 @@ import Footer from '@/components/Footer' // Assuming your Footer component
 import StatsChart from '@/components/StatsChart'
 
 // Helper to format the data for the chart
-const formatChartData = (data: any[]) => {
+interface TestResult {
+  id: string
+  taken_at: string
+  wpm: number
+  accuracy: number | string
+  test_level: string
+  error_count: number
+}
+
+const formatChartData = (data: TestResult[]) => {
   return data.map(item => ({
     ...item,
     // Make sure accuracy is a number
@@ -14,7 +23,7 @@ const formatChartData = (data: any[]) => {
 }
 
 export default async function DashboardPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // 1. Get the user. Redirect to login if not authenticated.
   const {
