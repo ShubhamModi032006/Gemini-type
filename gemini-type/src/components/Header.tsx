@@ -40,6 +40,12 @@ const Header = ({ user }: { user: User | null }) => {
             >
               Dashboard
             </Link>
+            <Link
+              href="/settings"
+              className="text-sm text-gray-300 hover:underline"
+            >
+              Settings
+            </Link>
             <span className="text-sm text-gray-300 hidden sm:block">
               {user.email}
             </span>

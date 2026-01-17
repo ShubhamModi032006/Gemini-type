@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import useTyping from '@/lib/hooks/useTyping'
+import { useSettings } from '@/contexts/SettingsContext'
 import Results from './Results'
 import AILoader from './AILoader'
 
@@ -10,12 +11,42 @@ interface TypingBoxProps {
 }
 
 const TypingBox = ({ user }: TypingBoxProps) => {
+  const { settings } = useSettings()
   const [level, setLevel] = useState('Beginner')
   const [duration, setDuration] = useState(30)
   const [text, setText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [cursorVisible, setCursorVisible] = useState(true)
   const { typed, cursor, status, startTime, endTime, reset, mistakes, timeLeft, start } = useTyping(text, duration)
   const inputRef = useRef<HTMLInputElement | null>(null)
+  
+  // Cursor blinking animation
+  useEffect(() => {
+    if (status === 'in-progress' && cursor < text.length) {
+      const interval = setInterval(() => {
+        setCursorVisible((prev) => !prev)
+      }, 530)
+      return () => clearInterval(interval)
+    } else {
+      setCursorVisible(true)
+    }
+  }, [status, cursor, text.length])
+  
+  // Get cursor style based on settings
+  const getCursorChar = () => {
+    switch (settings.cursorStyle) {
+      case 'block':
+        return '█'
+      case 'line':
+        return '|'
+      case 'underline':
+        return '_'
+      case 'outline':
+        return '▯'
+      default:
+        return '|'
+    }
+  }
 
   const fetchText = async () => {
     setIsLoading(true)
@@ -127,7 +158,9 @@ const TypingBox = ({ user }: TypingBoxProps) => {
         </button>
       </div>
 
-      {status === 'in-progress' && <div className="text-center text-2xl mb-4">{timeLeft}</div>}
+      {status === 'in-progress' && settings.showTimer && (
+        <div className="text-center text-2xl mb-4">{timeLeft}</div>
+      )}
 
       <div className="relative">
         {isLoading ? (
@@ -135,8 +168,11 @@ const TypingBox = ({ user }: TypingBoxProps) => {
         ) : (
           <>
             <div
-              className="text-2xl text-gray-400 leading-relaxed tracking-wider"
-              style={{ minHeight: '150px' }}
+              className="text-gray-400 leading-relaxed tracking-wider"
+              style={{ 
+                minHeight: '150px',
+                fontSize: `${settings.fontSize}px`,
+              }}
             >
               {(text || '').split('').map((char, index) => {
                 const isTyped = index < typed.length
@@ -144,13 +180,49 @@ const TypingBox = ({ user }: TypingBoxProps) => {
                 const isCurrent = index === cursor
 
                 return (
-                  <span key={index} className="relative">
-                    <span
-                      className={`${isTyped ? (isCorrect ? 'text-white' : 'text-red-500') : ''}`}>
-                      {char}
-                    </span>
-                    {isCurrent && (
-                      <span className="absolute left-0 animate-pulse">|</span>
+                  <span key={index} className="relative inline-block">
+                    {isCurrent && settings.cursorStyle === 'block' ? (
+                      <span 
+                        className={`${settings.smoothCaret ? 'transition-all duration-75' : ''}`}
+                        style={{ 
+                          opacity: cursorVisible ? settings.caretOpacity : 0,
+                        }}
+                      >
+                        <span className="bg-yellow-600 text-yellow-600">{char || ' '}</span>
+                      </span>
+                    ) : isCurrent && settings.cursorStyle === 'underline' ? (
+                      <span 
+                        className={`${settings.smoothCaret ? 'transition-all duration-75' : ''}`}
+                        style={{ 
+                          opacity: cursorVisible ? settings.caretOpacity : 0,
+                        }}
+                      >
+                        <span className="border-b-2 border-yellow-600">{char || ' '}</span>
+                      </span>
+                    ) : isCurrent && settings.cursorStyle === 'outline' ? (
+                      <span 
+                        className={`${settings.smoothCaret ? 'transition-all duration-75' : ''}`}
+                        style={{ 
+                          opacity: cursorVisible ? settings.caretOpacity : 0,
+                        }}
+                      >
+                        <span className="text-yellow-600">{getCursorChar()}</span>
+                      </span>
+                    ) : isCurrent ? (
+                      <span 
+                        className={`text-yellow-600 ${settings.smoothCaret ? 'transition-all duration-75' : ''}`}
+                        style={{ 
+                          opacity: cursorVisible ? settings.caretOpacity : 0,
+                        }}
+                      >
+                        {getCursorChar()}
+                      </span>
+                    ) : (
+                      <span
+                        className={`${isTyped ? (isCorrect ? 'text-white' : 'text-red-500') : ''}`}
+                      >
+                        {char}
+                      </span>
                     )}
                   </span>
                 )

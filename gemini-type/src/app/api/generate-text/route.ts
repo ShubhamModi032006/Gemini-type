@@ -43,13 +43,13 @@ export async function POST(request: NextRequest) {
     let prompt = ''
     switch (level) {
       case 'Beginner':
-        prompt = 'Generate 50 simple lowercase English words. No punctuation.'
+        prompt = 'Generate 80 simple lowercase English words. No punctuation.'
         break
       case 'Intermediate':
-        prompt = 'Generate 70 lowercase words with commas and periods.'
+        prompt = 'Generate 80 lowercase words with commas and periods.'
         break
       case 'Advanced':
-        prompt = 'Generate 70 words with complex sentence structure and punctuation.'
+        prompt = 'Generate 80 words with complex sentence structure and punctuation.'
         break
     }
 

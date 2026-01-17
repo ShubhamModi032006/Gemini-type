@@ -24,3 +24,148 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Theme Styles */
+.theme-dark {
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+}
+
+.theme-light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f4f6;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+}
+
+.theme-blue {
+  --bg-primary: #0c1226;
+  --bg-secondary: #1e3a5f;
+  --text-primary: #bfdbfe;
+  --text-secondary: #93c5fd;
+}
+
+.theme-green {
+  --bg-primary: #0d1f0d;
+  --bg-secondary: #1f3f1f;
+  --text-primary: #bbf7d0;
+  --text-secondary: #86efac;
+}
+
+.theme-purple {
+  --bg-primary: #1a0d2e;
+  --bg-secondary: #3d1f5e;
+  --text-primary: #e9d5ff;
+  --text-secondary: #c084fc;
+}
+
+.theme-red {
+  --bg-primary: #1f0a0a;
+  --bg-secondary: #3f1515;
+  --text-primary: #fecaca;
+  --text-secondary: #fca5a5;
+}
+
+.theme-orange {
+  --bg-primary: #1f140a;
+  --bg-secondary: #3f2815;
+  --text-primary: #fed7aa;
+  --text-secondary: #fdba74;
+}
+
+/* Apply theme colors when theme class is present - using !important to override Tailwind */
+.theme-dark body,
+.theme-dark .bg-gray-900 {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .bg-gray-800 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.theme-light body,
+.theme-light .bg-gray-900 {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-light .bg-gray-800 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.theme-light .text-white {
+  color: var(--text-primary) !important;
+}
+
+.theme-blue body,
+.theme-blue .bg-gray-900 {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-blue .bg-gray-800 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.theme-blue .text-white {
+  color: var(--text-primary) !important;
+}
+
+.theme-green body,
+.theme-green .bg-gray-900 {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-green .bg-gray-800 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.theme-green .text-white {
+  color: var(--text-primary) !important;
+}
+
+.theme-purple body,
+.theme-purple .bg-gray-900 {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-purple .bg-gray-800 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.theme-purple .text-white {
+  color: var(--text-primary) !important;
+}
+
+.theme-red body,
+.theme-red .bg-gray-900 {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-red .bg-gray-800 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.theme-red .text-white {
+  color: var(--text-primary) !important;
+}
+
+.theme-orange body,
+.theme-orange .bg-gray-900 {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-orange .bg-gray-800 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.theme-orange .text-white {
+  color: var(--text-primary) !important;
+}
