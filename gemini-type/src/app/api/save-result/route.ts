@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export async function POST(request: NextRequest) {
   // 1. Create a Supabase client that can read the user's cookie
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // 2. Get the authenticated user from the server's session
   const {

@@ -14,7 +14,7 @@ const formatChartData = (data: any[]) => {
 }
 
 export default async function DashboardPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // 1. Get the user. Redirect to login if not authenticated.
   const {

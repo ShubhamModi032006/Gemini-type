@@ -6,7 +6,7 @@ import Footer from '@/components/Footer'
 // 2. Make the component async
 export default async function Home() {
   // 3. Fetch user data on the server
-  const supabase = createClient()
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()

@@ -5,6 +5,8 @@ import { useState, useEffect, useRef } from 'react'
 export type TypingStatus = 'waiting' | 'in-progress' | 'finished'
 
 const useTyping = (text: string, duration: number) => {
+  // Ensure text is always a string to prevent undefined errors
+  const safeText = text || ''
   const [typed, setTyped] = useState<string>('')
   const [cursor, setCursor] = useState<number>(0)
   const [status, setStatus] = useState<TypingStatus>('waiting')
@@ -51,14 +53,14 @@ const useTyping = (text: string, duration: number) => {
 
   // Effect to handle test completion when all text is typed
   useEffect(() => {
-    if (status === 'in-progress' && cursor === text.length) {
+    if (status === 'in-progress' && cursor === safeText.length) {
       setStatus('finished')
       setEndTime(Date.now())
       if (timerRef.current) {
         clearInterval(timerRef.current)
       }
     }
-  }, [status, cursor, text.length])
+  }, [status, cursor, safeText.length])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -68,7 +70,7 @@ const useTyping = (text: string, duration: number) => {
         setTyped((prev) => prev.slice(0, -1))
         setCursor((prev) => Math.max(0, prev - 1))
       } else if (e.key.length === 1) {
-        if (e.key !== text[cursor]) {
+        if (e.key !== safeText[cursor]) {
           setMistakes((prev) => prev + 1)
         }
         setTyped((prev) => prev + e.key)
@@ -81,7 +83,7 @@ const useTyping = (text: string, duration: number) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [status, text, cursor])
+  }, [status, safeText, cursor])
 
   const reset = () => {
     setTyped('')

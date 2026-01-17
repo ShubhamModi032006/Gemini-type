@@ -28,7 +28,7 @@ const TypingBox = ({ user }: TypingBoxProps) => {
         body: JSON.stringify({ level }),
       })
       const data = await response.json()
-      setText(data.text)
+      setText(data.text || '')
       reset()
     } catch (error) {
       console.error('Error fetching text:', error)
@@ -138,7 +138,7 @@ const TypingBox = ({ user }: TypingBoxProps) => {
               className="text-2xl text-gray-400 leading-relaxed tracking-wider"
               style={{ minHeight: '150px' }}
             >
-              {text.split('').map((char, index) => {
+              {(text || '').split('').map((char, index) => {
                 const isTyped = index < typed.length
                 const isCorrect = isTyped && typed[index] === char
                 const isCurrent = index === cursor
