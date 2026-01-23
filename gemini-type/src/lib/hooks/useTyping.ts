@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useSettings } from '@/contexts/SettingsContext'
 
 export type TypingStatus = 'waiting' | 'in-progress' | 'finished'
 
@@ -62,28 +63,67 @@ const useTyping = (text: string, duration: number) => {
     }
   }, [status, cursor, safeText.length])
 
+  const { settings } = useSettings() // Access settings context
+  
+  // Audio refs
+  const clickSoundRef = useRef<HTMLAudioElement | null>(null)
+  const errorSoundRef = useRef<HTMLAudioElement | null>(null)
+  
+  // Initialize audio
+  useEffect(() => {
+    clickSoundRef.current = new Audio('/sounds/click.mp3') // You'll need to add these files
+    errorSoundRef.current = new Audio('/sounds/error.mp3')
+    
+    // Preload
+    clickSoundRef.current.volume = 0.5
+    errorSoundRef.current.volume = 0.5
+  }, [])
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent interactions if typing box isn't focused or active (if needed)
+      // For now, attaching to window is fine but ideally should be on the input.
       if (status !== 'in-progress') return
+      
+      // Ignore modifier keys
+      if (e.key === 'Control' || e.key === 'Alt' || e.key === 'Shift' || e.key === 'Meta') return
 
       if (e.key === 'Backspace') {
         setTyped((prev) => prev.slice(0, -1))
         setCursor((prev) => Math.max(0, prev - 1))
-      } else if (e.key.length === 1) {
-        if (e.key !== safeText[cursor]) {
-          setMistakes((prev) => prev + 1)
+        // Optional: Play sound on backspace?
+        if (settings.soundOnClick && clickSoundRef.current) {
+          clickSoundRef.current.currentTime = 0
+          clickSoundRef.current.play().catch(() => {})
         }
+      } else if (e.key.length === 1) {
+        let isCorrect = e.key === safeText[cursor]
+        
+        if (!isCorrect) {
+          setMistakes((prev) => prev + 1)
+          if (settings.soundOnError && errorSoundRef.current) {
+            errorSoundRef.current.currentTime = 0
+            errorSoundRef.current.play().catch(() => {})
+          }
+        } else {
+             if (settings.soundOnClick && clickSoundRef.current) {
+                clickSoundRef.current.currentTime = 0
+                clickSoundRef.current.play().catch(() => {})
+             }
+        }
+        
         setTyped((prev) => prev + e.key)
         setCursor((prev) => prev + 1)
       }
     }
 
+    // Attach to window only if we want global capture, otherwise let the input handle it
     window.addEventListener('keydown', handleKeyDown)
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [status, safeText, cursor])
+  }, [status, safeText, cursor, settings])
 
   const reset = () => {
     setTyped('')

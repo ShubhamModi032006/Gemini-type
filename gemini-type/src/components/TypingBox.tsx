@@ -19,7 +19,7 @@ const TypingBox = ({ user }: TypingBoxProps) => {
   const [cursorVisible, setCursorVisible] = useState(true)
   const { typed, cursor, status, startTime, endTime, reset, mistakes, timeLeft, start } = useTyping(text, duration)
   const inputRef = useRef<HTMLInputElement | null>(null)
-  
+
   // Cursor blinking animation
   useEffect(() => {
     if (status === 'in-progress' && cursor < text.length) {
@@ -31,7 +31,7 @@ const TypingBox = ({ user }: TypingBoxProps) => {
       setCursorVisible(true)
     }
   }, [status, cursor, text.length])
-  
+
   // Get cursor style based on settings
   const getCursorChar = () => {
     switch (settings.cursorStyle) {
@@ -158,8 +158,28 @@ const TypingBox = ({ user }: TypingBoxProps) => {
         </button>
       </div>
 
-      {status === 'in-progress' && settings.showTimer && (
-        <div className="text-center text-2xl mb-4">{timeLeft}</div>
+      {status === 'in-progress' && (
+        <div className="flex justify-center gap-8 text-2xl mb-4 font-mono text-gray-400">
+          {settings.showTimer && (
+            <div className={`transition-colors ${timeLeft <= 5 ? 'text-red-500' : ''}`}>
+              {timeLeft}s
+            </div>
+          )}
+
+          {settings.showLiveWpm && startTime && (
+            <div>
+              {Math.max(0, Math.round(
+                ((typed.length / 5) / ((Date.now() - startTime) / 1000 / 60)) || 0
+              ))} wpm
+            </div>
+          )}
+
+          {settings.showAccuracy && typed.length > 0 && (
+            <div>
+              {Math.max(0, Math.round(((typed.length - mistakes) / typed.length) * 100))}%
+            </div>
+          )}
+        </div>
       )}
 
       <div className="relative">
@@ -168,8 +188,8 @@ const TypingBox = ({ user }: TypingBoxProps) => {
         ) : (
           <>
             <div
-              className="text-gray-400 leading-relaxed tracking-wider"
-              style={{ 
+              className="text-gray-400 leading-relaxed tracking-wider whitespace-pre-wrap break-words"
+              style={{
                 minHeight: '150px',
                 fontSize: `${settings.fontSize}px`,
               }}
@@ -181,41 +201,43 @@ const TypingBox = ({ user }: TypingBoxProps) => {
 
                 return (
                   <span key={index} className="relative inline-block">
-                    {isCurrent && settings.cursorStyle === 'block' ? (
-                      <span 
-                        className={`${settings.smoothCaret ? 'transition-all duration-75' : ''}`}
-                        style={{ 
-                          opacity: cursorVisible ? settings.caretOpacity : 0,
-                        }}
-                      >
-                        <span className="bg-yellow-600 text-yellow-600">{char || ' '}</span>
-                      </span>
-                    ) : isCurrent && settings.cursorStyle === 'underline' ? (
-                      <span 
-                        className={`${settings.smoothCaret ? 'transition-all duration-75' : ''}`}
-                        style={{ 
-                          opacity: cursorVisible ? settings.caretOpacity : 0,
-                        }}
-                      >
-                        <span className="border-b-2 border-yellow-600">{char || ' '}</span>
-                      </span>
-                    ) : isCurrent && settings.cursorStyle === 'outline' ? (
-                      <span 
-                        className={`${settings.smoothCaret ? 'transition-all duration-75' : ''}`}
-                        style={{ 
-                          opacity: cursorVisible ? settings.caretOpacity : 0,
-                        }}
-                      >
-                        <span className="text-yellow-600">{getCursorChar()}</span>
-                      </span>
-                    ) : isCurrent ? (
-                      <span 
-                        className={`text-yellow-600 ${settings.smoothCaret ? 'transition-all duration-75' : ''}`}
-                        style={{ 
-                          opacity: cursorVisible ? settings.caretOpacity : 0,
-                        }}
-                      >
-                        {getCursorChar()}
+                    {/* Rendering Logic:
+                      If it's the current character (cursor position):
+                        - Render the cursor AND the character.
+                        - Style depends on cursor type.
+                    */}
+                    {isCurrent ? (
+                      <span className="relative">
+                        {/* The Character itself */}
+                        <span className={`${settings.cursorStyle === 'block' ? 'text-black z-10 relative' : 'text-yellow-600'}`}>
+                          {char || ' '}
+                        </span>
+
+                        {/* The Cursor overlay/underlay */}
+                        {settings.cursorStyle === 'block' && (
+                          <span
+                            className={`absolute inset-0 bg-yellow-600 -z-0 ${settings.smoothCaret ? 'transition-all duration-75' : ''}`}
+                            style={{ opacity: cursorVisible ? settings.caretOpacity : 0 }}
+                          ></span>
+                        )}
+                        {settings.cursorStyle === 'line' && (
+                          <span
+                            className={`absolute left-0 top-0 bottom-0 w-0.5 bg-yellow-600 ${settings.smoothCaret ? 'transition-all duration-75' : ''}`}
+                            style={{ opacity: cursorVisible ? settings.caretOpacity : 0 }}
+                          ></span>
+                        )}
+                        {settings.cursorStyle === 'underline' && (
+                          <span
+                            className={`absolute left-0 bottom-0 right-0 h-0.5 bg-yellow-600 ${settings.smoothCaret ? 'transition-all duration-75' : ''}`}
+                            style={{ opacity: cursorVisible ? settings.caretOpacity : 0 }}
+                          ></span>
+                        )}
+                        {settings.cursorStyle === 'outline' && (
+                          <span
+                            className={`absolute inset-0 border border-yellow-600 ${settings.smoothCaret ? 'transition-all duration-75' : ''}`}
+                            style={{ opacity: cursorVisible ? settings.caretOpacity : 0 }}
+                          ></span>
+                        )}
                       </span>
                     ) : (
                       <span
@@ -227,6 +249,7 @@ const TypingBox = ({ user }: TypingBoxProps) => {
                   </span>
                 )
               })}
+
             </div>
             <input
               ref={inputRef}
